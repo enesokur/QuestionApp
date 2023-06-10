@@ -7,7 +7,7 @@ import { OutlinedInput } from '@mui/material';
 import { Button} from "@mui/material";
 import { useState } from 'react';
 function CommentForm(props){
-    const {userName,userId,postId,updateComments} = props;
+    const {userName,userId,postId,loadComments} = props;
     const [text,setText] = useState("");
     const saveComment = () => {
         fetch('http://localhost:8080/comments', 
@@ -21,7 +21,7 @@ function CommentForm(props){
                 })
             })
             .then(response => response.json())
-            .then(result => updateComments(result) )
+            .then(result => loadComments())
             .catch(err => console.log(err));
     }
     const handleSubmit = () => {

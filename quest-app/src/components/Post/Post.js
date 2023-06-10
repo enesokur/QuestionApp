@@ -30,10 +30,10 @@ function Post(props){
 
     const [expanded, setExpanded] = useState(false);
     const [liked, setLiked] = useState(false);
-    const {title,text,userId,userName, postId,likes,removePost,addLike,removeLike} = props;
+    const {title,text,userId,userName, postId,loadPosts,likes} = props;
     const [commentList,setCommentList] = useState([]);
     const [likeCount, setLikeCount] = useState(likes.length);
-    var likeIdToDelete = -1;
+    const [currentLike,setCurrentLike] = useState({});
 
     const loadComments = () => {
         fetch("http://localhost:8080/comments?postId=" + postId)
@@ -41,10 +41,6 @@ function Post(props){
         .then((result) => {
             setCommentList(result);
         })
-    }
-
-    const updateComments = (newComment) => {
-        setCommentList([...commentList,newComment]);
     }
 
     const handleExpandClick = () => {
@@ -70,6 +66,7 @@ function Post(props){
         if(like != null){
             setLiked(true)
         }
+        findLike();
     }
 
     const saveLike = () => {
@@ -83,23 +80,31 @@ function Post(props){
                 })
             })
             .then(response => response.json())
-            .then(result => addLike(result,postId))
-            .catch(err => console.log(err));
+            .then(result => {
+                setCurrentLike(result);
+            })
     }
-
     const findLike = () => {
-        var like = likes.find( like => like.userId === userId )
-        likeIdToDelete = like.id;
+        const like = likes.find(like => like.userId === userId);
+        setCurrentLike(like);
     }
-
     const deleteLike = () => {
-        findLike();
-        fetch('http://localhost:8080/likes/' + likeIdToDelete, 
+        fetch('http://localhost:8080/likes/' + currentLike.id, 
             {
                 method: "DELETE",
             })
             .catch(err => console.log(err));    
-        removeLike(postId,likeIdToDelete);
+    }
+
+    const removePost = (id) => {
+        fetch('http://localhost:8080/posts/' + id, 
+            {
+                method: "DELETE",
+            })
+            .then((response) => {
+                loadPosts()
+            })
+            .catch(err => console.log(err));
     }
 
     useEffect(() => {
@@ -148,7 +153,7 @@ function Post(props){
                         {commentList.map((comment) => {
                             return <Comment commentId={comment.id} text={comment.text} userName={comment.userName} userId={comment.userId}/>
                         })}
-                        <CommentForm userName={"user"} userId={1} postId={postId} updateComments={updateComments}/>
+                        <CommentForm userName={"user"} userId={1} postId={postId} loadComments={loadComments}/>
                     </CardContent>
                 </Collapse>
             </Card>

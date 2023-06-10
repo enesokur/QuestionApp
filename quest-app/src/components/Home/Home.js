@@ -8,6 +8,7 @@ function Home(){
     const [error, setError] = useState(null);
     
     const loadPosts = () => {
+        console.log("çalıştı");
         fetch("http://localhost:8080/posts")
         .then(response => response.json())
         .then((result) => {
@@ -19,68 +20,19 @@ function Home(){
             setError(error);
         })
     }
-    const addPosts = (newPost) => {
-        setPostList([...postList,newPost]);
-    }
 
-    const removePost = (id) => {
-        var index = postList.findIndex(post => post.id === id);
-        const postListBeforeRemoveItem = postList.slice(0,index);
-        const postListAfterRemoveItem = postList.slice(index+1,postList.length);
-        removePostFromDb(id);
-        setPostList([...postListBeforeRemoveItem,...postListAfterRemoveItem]);
-        console.log(postList);
-    }
-
-    const removePostFromDb = (id) => {
-        fetch('http://localhost:8080/posts/' + id, 
+    const savePost = (newPost) => {
+        fetch('http://localhost:8080/posts', 
             {
-                method: "DELETE",
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newPost)
+            })
+            .then(response => response.json())
+            .then((result) => {
+                loadPosts();
             })
             .catch(err => console.log(err));
-    }
-
-    const addLike = (result,postId) => {
-        setPostList(current => {
-            let post = {};
-            var index = 0;
-            current.forEach(eachpost => {
-                if(eachpost.id === postId){
-                    post = eachpost;
-                    index = current.indexOf(eachpost);
-                }
-            });
-            if(post.likes != null){
-                post.likes = [...post.likes,result];
-            }
-            else{
-                post.likes = [result];
-            }
-            return [...current.slice(0,index),post,...current.slice(index+1,current.length)]
-        });
-    }
-    
-    const removeLike = (postId,likeIdToDelete) => {
-        setPostList(current => {
-            let post = {};
-            var postIndex = 0;
-            current.forEach(eachpost => {
-                if(eachpost.id === postId ){
-                    post = eachpost;
-                    postIndex = current.indexOf(eachpost);
-                }
-            });
-            if(post.likes != null){
-                var likeIndex = 0;
-                post.likes.forEach(like => {
-                    if(like.id === likeIdToDelete){
-                        likeIndex = post.likes.indexOf(like);
-                    }
-                });
-                post.likes = [...post.likes.slice(0,likeIndex),...post.likes.slice(likeIndex+1,post.likes.length)]
-            }
-            return [...current.slice(0,postIndex),post,...current.slice(postIndex+1,current.length)]
-        })
     }
 
     useEffect(() => {
@@ -107,9 +59,9 @@ function Home(){
                     alignItems: "center",
                     backgroundColor: "#DBE8F1",
                     }}>
-                        <PostForm userId={1} userName="user" addPosts={addPosts}/>
+                        <PostForm userId={1} userName="user" savePost={savePost}/>
                         {postList.map((post) => {
-                            return <Post title={post.title} text={post.text} userId={post.userId} userName={post.userName} postId={post.id} likes={post.likes} removePost={removePost} addLike={addLike} removeLike={removeLike}/>
+                            return <Post title={post.title} text={post.text} userId={post.userId} userName={post.userName} postId={post.id} loadPosts={loadPosts} likes={post.likes}/>
                         })}
                 </div>
             </div>

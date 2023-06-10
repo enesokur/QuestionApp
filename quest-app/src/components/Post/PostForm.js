@@ -9,7 +9,7 @@ import { Button, InputAdornment } from "@mui/material";
 import { useState } from 'react';
 
 function PostForm(props){
-    const {userId,userName,addPosts} = props;
+    const {userId,userName,savePost} = props;
     const [title,setTitle] = useState("");
     const [text,setText] = useState("");
     const [isSent,setIsSent] = useState(false);
@@ -23,24 +23,13 @@ function PostForm(props){
         setIsSent(false);
     }
 
-    const savePost = () => {
-        fetch('http://localhost:8080/posts', 
-            {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    title: title,
-                    text: text,
-                    userId: userId,
-                })
-            })
-            .then(response => response.json())
-            .then(result => addPosts(result))
-            .catch(err => console.log(err));
-    }
 
     const handleSubmit = () => {
-        savePost();
+        savePost({ 
+                title: title,
+                text: text,
+                userId: userId,
+            });
         setIsSent(true);
         setText("");
         setTitle("");
