@@ -6,28 +6,29 @@ import { InputAdornment } from "@mui/material";
 import { OutlinedInput } from '@mui/material';
 import { Button} from "@mui/material";
 import { useState } from 'react';
+import axios from 'axios';
 function CommentForm(props){
     const {userName,userId,postId,loadComments} = props;
     const [text,setText] = useState("");
-    const saveComment = () => {
-        fetch('http://localhost:8080/comments', 
-            {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    userId: userId,
-                    postId: postId,
-                    text: text
-                })
-            })
-            .then(response => response.json())
-            .then(result => loadComments())
-            .catch(err => console.log(err));
+    const saveComment = async () => {
+        try{
+            await axios.post("http://localhost:8080/comments",{ 
+            userId: userId,
+            postId: postId,
+            text: text
+            });
+            loadComments();
+        }
+        catch(err){
+            console.log(err);
+        }
     }
+
     const handleSubmit = () => {
         saveComment();
         setText("");
     }
+    
     return(
         <div>
                 <CardContent sx={{width: "50vw"}}>

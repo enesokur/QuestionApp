@@ -1,38 +1,34 @@
 import Post from "../Post/Post.js";
 import { useState,useEffect } from "react";
 import PostForm from "../Post/PostForm.js";
+import axios from "axios";
 
 function Home(){
     const [postList, setPostList] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [error, setError] = useState(null);
     
-    const loadPosts = () => {
-        console.log("çalıştı");
-        fetch("http://localhost:8080/posts")
-        .then(response => response.json())
-        .then((result) => {
+    const loadPosts =  async () => {
+        try{
+            const response = await axios.get("http://localhost:8080/posts");
             setIsLoaded(true);
-            setPostList(result);
-            
-        },(error) => {
+            setPostList(response.data);
+        }
+        catch(err){
             setIsLoaded(true);
             setError(error);
-        })
+            console.log(err.message);
+        }
     }
 
-    const savePost = (newPost) => {
-        fetch('http://localhost:8080/posts', 
-            {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newPost)
-            })
-            .then(response => response.json())
-            .then((result) => {
-                loadPosts();
-            })
-            .catch(err => console.log(err));
+    const savePost = async (newPost) => {
+        try{
+            await axios.post("http://localhost:8080/posts",newPost);
+            loadPosts();
+        }
+        catch(err){
+            console.log(err);
+        }
     }
 
     useEffect(() => {

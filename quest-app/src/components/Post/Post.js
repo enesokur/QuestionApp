@@ -14,6 +14,7 @@ import Comment from "../Comment/Comment.js";
 import CommentForm from "../Comment/CommentForm.js";
 import { useEffect } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
+import axios from "axios";
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -35,12 +36,14 @@ function Post(props){
     const [likeCount, setLikeCount] = useState(likes.length);
     const [currentLike,setCurrentLike] = useState({});
 
-    const loadComments = () => {
-        fetch("http://localhost:8080/comments?postId=" + postId)
-        .then(response => response.json())
-        .then((result) => {
-            setCommentList(result);
-        })
+    const loadComments = async () => {
+        try{
+            const response = await axios.get("http://localhost:8080/comments?postId=" + postId);
+            setCommentList(response.data);
+        }
+        catch(err){
+            console.log(err);
+        }
     }
 
     const handleExpandClick = () => {
@@ -69,8 +72,18 @@ function Post(props){
         findLike();
     }
 
-    const saveLike = () => {
-        fetch('http://localhost:8080/likes', 
+    const saveLike = async () => {
+        try{
+            const response = await axios.post("http://localhost:8080/likes",{ 
+            postId: postId,
+            userId: userId,
+            });
+            setCurrentLike(response.data);
+        }
+        catch(err){
+            console.log(err);
+        }
+        /*fetch('http://localhost:8080/likes', 
             {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
@@ -82,29 +95,35 @@ function Post(props){
             .then(response => response.json())
             .then(result => {
                 setCurrentLike(result);
-            })
+            })*/
     }
     const findLike = () => {
         const like = likes.find(like => like.userId === userId);
         setCurrentLike(like);
     }
-    const deleteLike = () => {
+    const deleteLike = async () => {
+        try{
+            await axios.delete("http://localhost:8080/likes/" + currentLike.id);
+        }
+        catch(err){
+            console.log(err);
+        }
+        /*
         fetch('http://localhost:8080/likes/' + currentLike.id, 
             {
                 method: "DELETE",
             })
-            .catch(err => console.log(err));    
+            .catch(err => console.log(err)); */   
     }
 
-    const removePost = (id) => {
-        fetch('http://localhost:8080/posts/' + id, 
-            {
-                method: "DELETE",
-            })
-            .then((response) => {
-                loadPosts()
-            })
-            .catch(err => console.log(err));
+    const removePost = async (id) => {
+        try{
+            await axios.delete("http://localhost:8080/posts/" + id);
+            loadPosts();
+        }
+        catch(err){
+            console.log(err);
+        }
     }
 
     useEffect(() => {
