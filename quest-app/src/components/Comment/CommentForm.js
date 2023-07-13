@@ -16,6 +16,10 @@ function CommentForm(props){
             userId: userId,
             postId: postId,
             text: text
+            }, {
+                headers: {
+                    "Authorization": localStorage.getItem("message")
+                }
             });
             loadComments();
         }

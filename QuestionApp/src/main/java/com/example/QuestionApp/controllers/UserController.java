@@ -26,11 +26,11 @@ public class UserController {
 	public List<User> getAllUsers(){
 		return userService.getAll();
 	}
-	
+	/*
 	@PostMapping
 	public User createUser(@RequestBody User user) {
 		return userService.save(user);
-	}
+	}*/
 	
 	@GetMapping("/{userId}")
 	public User getUserById(@PathVariable Long userId) {

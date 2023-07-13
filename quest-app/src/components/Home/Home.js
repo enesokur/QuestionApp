@@ -10,7 +10,11 @@ function Home(){
     
     const loadPosts =  async () => {
         try{
-            const response = await axios.get("http://localhost:8080/posts");
+            const response = await axios.get("http://localhost:8080/posts",{
+                headers: {
+                    "Authorization": localStorage.getItem("message")
+                }
+            });
             setIsLoaded(true);
             setPostList(response.data);
         }
@@ -23,7 +27,11 @@ function Home(){
 
     const savePost = async (newPost) => {
         try{
-            await axios.post("http://localhost:8080/posts",newPost);
+            await axios.post("http://localhost:8080/posts",newPost,{
+                headers: {
+                    "Authorization": localStorage.getItem("message")
+                }
+            });
             loadPosts();
         }
         catch(err){
@@ -55,7 +63,7 @@ function Home(){
                     alignItems: "center",
                     backgroundColor: "#DBE8F1",
                     }}>
-                        <PostForm userId={1} userName="user" savePost={savePost}/>
+                        <PostForm userId={localStorage.getItem("userId")} userName={localStorage.getItem("userName")} savePost={savePost}/>
                         {postList.map((post) => {
                             return <Post title={post.title} text={post.text} userId={post.userId} userName={post.userName} postId={post.id} loadPosts={loadPosts} likes={post.likes}/>
                         })}

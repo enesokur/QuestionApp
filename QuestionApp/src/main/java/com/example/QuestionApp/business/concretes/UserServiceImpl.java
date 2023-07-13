@@ -3,11 +3,13 @@ package com.example.QuestionApp.business.concretes;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.QuestionApp.business.abstracts.UserService;
 import com.example.QuestionApp.entities.User;
 import com.example.QuestionApp.repos.UserRepository;
+import com.example.QuestionApp.requests.RegisterRequest;
 
 import lombok.AllArgsConstructor;
 
@@ -16,6 +18,7 @@ import lombok.AllArgsConstructor;
 public class UserServiceImpl implements UserService {
 	
 	private UserRepository userRepository;
+	private PasswordEncoder passwordEncoder;
 	
 	@Override
 	public List<User> getAll() {
@@ -23,7 +26,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User save(User user) {
+	public User save(RegisterRequest registerRequest) {
+		User user = new User();
+		user.setUserName(registerRequest.getUserName());
+		user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 		return userRepository.save(user);
 	}
 
@@ -52,8 +58,10 @@ public class UserServiceImpl implements UserService {
 	public void delete(Long id) {
 		userRepository.deleteById(id);
 	}
-	
-	
-	
+
+	@Override
+	public User getByName(String userName) {
+		return userRepository.findByUserName(userName);
+	}
 	
 }

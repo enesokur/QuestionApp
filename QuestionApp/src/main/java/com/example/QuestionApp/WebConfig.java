@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 
 public class WebConfig{
-	
+	/*
 	@Bean
     public WebMvcConfigurer corsConfigurer()
     {
@@ -18,6 +18,6 @@ public class WebConfig{
                 registry.addMapping("/**").allowedOrigins("http://localhost:3000").allowedMethods("*");
             }
         };
-    }
+    }*/
 
 }

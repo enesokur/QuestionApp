@@ -38,7 +38,11 @@ function Post(props){
 
     const loadComments = async () => {
         try{
-            const response = await axios.get("http://localhost:8080/comments?postId=" + postId);
+            const response = await axios.get("http://localhost:8080/comments?postId=" + postId,{
+                headers: {
+                    "Authorization": localStorage.getItem("message")
+                }
+            });
             setCommentList(response.data);
         }
         catch(err){
@@ -65,7 +69,7 @@ function Post(props){
     }
 
     const checkLikes = () => {
-        var like = likes.find(like => like.userId === userId)
+        var like = likes.find(like => "" + like.userId === localStorage.getItem("userId"))
         if(like != null){
             setLiked(true)
         }
@@ -76,7 +80,11 @@ function Post(props){
         try{
             const response = await axios.post("http://localhost:8080/likes",{ 
             postId: postId,
-            userId: userId,
+            userId: localStorage.getItem("userId"),
+            }, {
+                headers:{
+                    "Authorization": localStorage.getItem("message")
+                }
             });
             setCurrentLike(response.data);
         }
@@ -98,12 +106,16 @@ function Post(props){
             })*/
     }
     const findLike = () => {
-        const like = likes.find(like => like.userId === userId);
+        const like = likes.find(like => "" + like.userId === localStorage.getItem("userId"));
         setCurrentLike(like);
     }
     const deleteLike = async () => {
         try{
-            await axios.delete("http://localhost:8080/likes/" + currentLike.id);
+            await axios.delete("http://localhost:8080/likes/" + currentLike.id,{
+                headers:{
+                    "Authorization": localStorage.getItem("message")
+                }
+            });
         }
         catch(err){
             console.log(err);
@@ -118,7 +130,11 @@ function Post(props){
 
     const removePost = async (id) => {
         try{
-            await axios.delete("http://localhost:8080/posts/" + id);
+            await axios.delete("http://localhost:8080/posts/" + id,{
+                headers:{
+                    "Authorization": localStorage.getItem("message")
+                }
+            });
             loadPosts();
         }
         catch(err){
@@ -172,7 +188,7 @@ function Post(props){
                         {commentList.map((comment) => {
                             return <Comment commentId={comment.id} text={comment.text} userName={comment.userName} userId={comment.userId}/>
                         })}
-                        <CommentForm userName={"user"} userId={1} postId={postId} loadComments={loadComments}/>
+                        <CommentForm userName={localStorage.getItem("userName")} userId={localStorage.getItem("userId")} postId={postId} loadComments={loadComments}/>
                     </CardContent>
                 </Collapse>
             </Card>

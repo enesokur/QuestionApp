@@ -14,11 +14,21 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useState } from "react";
+import { createBrowserHistory } from "history";
 
-const id = 1;
 const drawerWidth = 240;
-const navItems = [<Link style={{color: "white", textDecoration: "none"}} to="/">Home</Link>, 
-                  <Link style={{color: "white", textDecoration: "none"}} to={"/users/" + id}>User</Link>];
+const history = createBrowserHistory();
+const userLogOut = () => {
+  localStorage.removeItem("message");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("userName");
+  history.push("/auth");
+  history.go(0);
+}
+const navItems = [<Link style={{color: "#E4D00A", textDecoration: "none"}} to="/">Home</Link>, 
+                  <Link style={{color: "#E4D00A", textDecoration: "none"}} to={"/users/" + localStorage.getItem("userId")}>Profile</Link>,
+                  <Button style={{color: "#E4D00A", textDecoration: "none"}} variant="text" onClick={() => userLogOut()}>Logout</Button>
+                ];
 
 function Navbar(props) {
     const { window } = props;
@@ -29,7 +39,7 @@ function Navbar(props) {
     };
   
     const drawer = (
-      <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+      <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center'}}>
         <Typography variant="h6" sx={{ my: 2 }}>
           MUI
         </Typography>
@@ -69,6 +79,8 @@ function Navbar(props) {
             >
               Question App
             </Typography>
+            {
+              localStorage.getItem("userId") != null ? 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               {navItems.map((item) => (
                 <Button key={item} sx={{ color: '#fff' }}>
@@ -76,6 +88,8 @@ function Navbar(props) {
                 </Button>
               ))}
             </Box>
+            : <div></div>
+            }
           </Toolbar>
         </AppBar>
         <Box component="nav">
@@ -89,7 +103,7 @@ function Navbar(props) {
             }}
             sx={{
               display: { xs: 'block', sm: 'none' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth}
             }}
           >
             {drawer}
